@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     const auth = localStorage.getItem('luna_auth');
@@ -11,9 +12,12 @@ export function useAuth() {
   }, []);
 
   const login = (email: string, password: string) => {
-    if (email === 'admin@luna.com' && password === 'admin123') {
+    const users = JSON.parse(localStorage.getItem('luna_users') || '[]');
+    const user = users.find((u: any) => u.email === email && u.password === password);
+    if (user) {
       localStorage.setItem('luna_auth', 'true');
       localStorage.setItem('luna_user', email);
+      setUserName(user.name || '');
       setIsAuthenticated(true);
       return true;
     }
@@ -26,5 +30,5 @@ export function useAuth() {
     setIsAuthenticated(false);
   };
 
-  return { isAuthenticated, loading, login, logout };
+  return { isAuthenticated, loading, login, logout, userName };
 }
